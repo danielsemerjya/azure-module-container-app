@@ -1,8 +1,10 @@
 data "azurerm_resource_group" "this" {
-  name = var.resource_group_name
+  provider = azurerm.main
+  name     = var.resource_group_name
 }
 
 resource "azurerm_log_analytics_workspace" "this" {
+  provider            = azurerm.main
   name                = "law-${var.container_app_name}"
   location            = data.azurerm_resource_group.this.location
   resource_group_name = data.azurerm_resource_group.this.name
@@ -11,6 +13,8 @@ resource "azurerm_log_analytics_workspace" "this" {
 }
 
 resource "azurerm_container_app_environment" "this" {
+  provider = azurerm.main
+
   name                       = "cae-${var.container_app_name}"
   location                   = data.azurerm_resource_group.this.location
   resource_group_name        = data.azurerm_resource_group.this.name
@@ -18,6 +22,8 @@ resource "azurerm_container_app_environment" "this" {
 }
 
 resource "azurerm_container_app" "this" {
+  provider = azurerm.main
+
   for_each                     = { for container in var.containers : container.name => container }
   name                         = each.key
   container_app_environment_id = azurerm_container_app_environment.this.id
